@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Eletricity.Configuration;
 using Eletricity.Data;
 using Eletricity.Helper;
 using Microsoft.AspNetCore.Http;
@@ -7,11 +8,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Eletricity
 {
+    
     public class GetEloverblik
     {
+
+        private readonly ConnectionSettings _connectionSettings;
+        private static ELoverblikAccess _eloverblikAccess;
+  
+
+        public GetEloverblik(IOptions<ConnectionSettings> connectionStrings, IOptions<ELoverblikAccess> eloverblikAccess)
+        {
+          
+            _connectionSettings = connectionStrings?.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _eloverblikAccess = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
+         
+        }
+
         [FunctionName("GetEloverblik")]
 
 #if RELEASE
@@ -20,33 +36,37 @@ namespace Eletricity
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
-        public static async Task<IActionResult> Run(
+        public  async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 
 #endif
-
-        {
+        {            
+            var d = _eloverblikAccess.MeteringToken;
+            var s = _connectionSettings.SQLPassword;
+           
             try
             {
-
+                ///HER ER MIN FEJL : JEG GÆTTER PÅ NOGET MED ET INTERFACE SKAL LAVES?
+                ///DEN BROKKER SIG OVER STATIC KLASSER - MEN JEG FORSTÅR MIG IKKE HELT PÅ DEPENDENCY INJECTION JEG HAR LAVET ØVERST
+                ///VILLE TROR DEN SKULLE ARVE EN VOID FRA ET INTERFACE? ELLER MÅSKE DER ER EN SMARTERE MÅDE
                 //Get token access
-                string token = await ElOverblikToken.GetToken();
+                string token = await ElOverblikToken.GetToken();  
 
                 //general api settings
                 string body = @"{
                          ""meteringPoints"": {
                                      ""meteringPoint"": [
-                                               ""XXXXXXXXXXXXXXXXX""
+                                               ""X""
                                                          ]
                                             }
                              }";
-
+                body.Replace("X", _eloverblikAccess.MeteringKey);
                 string contentType = "application/json";
 
-                await Prices.GetPrices(body, contentType, token);
+              //  await Prices.GetPrices(body, contentType, token);
 
                 string incrementalDate = Metering.GetIncrementalDate();
-                await Metering.GetMetering(body, contentType, token, incrementalDate);
+                //await Metering.GetMetering(body, contentType, token, incrementalDate);
             }
             catch (Exception ex)
             {
@@ -112,5 +132,7 @@ namespace Eletricity
 
             return Task.FromResult("done"); 
         }
+
+       
     }
 }

@@ -102,14 +102,15 @@ namespace Eletricity.Data
                     conn.Close();
 
                 }
+                return incrementalDate;
             }
             catch (Exception ex)
             {
-
-               // log.LogInformation(ex.Message);
+                return null;
+                // log.LogInformation(ex.Message);
             }
 
-            return incrementalDate;
+           
 
         }
     }
