@@ -13,7 +13,7 @@ namespace Eletricity.Helper
         public  static SqlConnection SqlConn()
 
         { 
-           SqlConnection conn = new SqlConnection(@"Data Source=eletricity.database.windows.net;Initial Catalog=EletricityDB;User ID=sqladmin;Password=JollyJumper1;Encrypt=True;TrustServerCertificate=False;Persist Security Info=False");
+           SqlConnection conn = new SqlConnection(@"Data Source=eletricity.database.windows.net;Initial Catalog=EletricityDB;User ID=sqladmin;Password=xxxxxxxx;Encrypt=True;TrustServerCertificate=False;Persist Security Info=False");
             return conn;         
           
         }

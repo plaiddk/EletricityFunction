@@ -15,7 +15,7 @@ namespace Eletricity.Helper
 
         public static async void UploadBlobFile(string name,string jsonData)
         {
-            var blobStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=saeletricity;AccountKey=zk/WwChwJrqsfSRerLWjguZH4+7RpALarC4yA1NhLuN1PvBu6OgNULS8rfIWT6MTQljZmjlCP8uQ+AStsAw9fw==;EndpointSuffix=core.windows.net";
+            var blobStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=saeletricity;AccountKey=xxxxxxxxxx;EndpointSuffix=core.windows.net";
             var blobStorageContainerName = "eletricityfiles";
             var container = new BlobContainerClient(blobStorageConnectionString, blobStorageContainerName);
             var blob = container.GetBlobClient($"{name}.json");
