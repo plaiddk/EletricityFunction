@@ -16,7 +16,7 @@ namespace Eletricity
     public class GetEloverblik
     {
 
-        private readonly ELOverblikSettings eLOverblikSettings;
+        private readonly ELOverblikSettings _eLOverblikSettings;
         private readonly ElOverblikToken _elOverblikToken;
         private readonly Prices _prices;
         private readonly Metering _metering;
@@ -26,7 +26,7 @@ namespace Eletricity
         public GetEloverblik(IOptions<ELOverblikSettings> eloverblikAccess, ElOverblikToken eloverblikToken, Prices prices, Metering metering, Spotprices spotPrices)
         {
 
-            eLOverblikSettings = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
+            _eLOverblikSettings = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
             _elOverblikToken = eloverblikToken;
             _prices = prices;
             _metering = metering;
@@ -37,8 +37,8 @@ namespace Eletricity
 
 #if RELEASE
                
-         //public static async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
-        public static async Task<IActionResult> Run(
+         //public  async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public  async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
         public async Task<IActionResult> Run(
@@ -61,9 +61,9 @@ namespace Eletricity
                                                          ]
                                             }
                              }";
-                body.Replace("X", eLOverblikSettings.MeteringKey);
+                body.Replace("X", _eLOverblikSettings.MeteringKey);
                 string contentType = "application/json";
-
+               
                 await _prices.GetPrices(body, contentType, token);
 
                 string incrementalDate = _metering.GetIncrementalDate();
@@ -87,8 +87,8 @@ namespace Eletricity
 
 #if RELEASE
                
-         //public static async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
-        public static async Task<IActionResult> RunSql(
+         //public  async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public  async Task<IActionResult> RunSql(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
         public async Task<IActionResult> RunSql(
@@ -116,8 +116,8 @@ namespace Eletricity
 
 #if RELEASE
                
-         //public static async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
-      public static Task<string> Spot(
+         //public  async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+      public  Task<string> Spot(
           [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
         public Task<string> Spot(

@@ -41,6 +41,8 @@ namespace Eletricity
 
 
             builder.Services.AddSingleton<ElOverblikToken>();
+           
+
             builder.Services.AddSingleton<Prices>();
             builder.Services.AddSingleton<Metering>();
             builder.Services.AddSingleton<Spotprices>(); 

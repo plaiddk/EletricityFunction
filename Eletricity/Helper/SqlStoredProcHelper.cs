@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,10 +11,12 @@ namespace Eletricity.Helper
     public class SqlExecuteHelper
     {
         private readonly SqlConnecter _sqlConn;
+        private readonly ILogger<SqlExecuteHelper> _logger;
 
-            public SqlExecuteHelper(SqlConnecter sqlConn)
+            public SqlExecuteHelper(SqlConnecter sqlConn, ILogger<SqlExecuteHelper> logger)
         {
             _sqlConn = sqlConn;
+            _logger = logger;
         }
         public string Execute(string query)
         {
@@ -31,7 +34,7 @@ namespace Eletricity.Helper
             catch (Exception ex)
             {
 
-                //log.LogInformation(ex.Message);
+               _logger.LogInformation(ex.Message);
             }
 
 

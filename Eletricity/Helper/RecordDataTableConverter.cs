@@ -32,6 +32,7 @@ namespace Eletricity.Helper
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                     //_logger.LogInformation(ex.Message);
                     return null;
                     
