@@ -7,13 +7,19 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Helper
 {
-    internal class SqlExecuteHelper
+    public class SqlExecuteHelper
     {
-        public static string Execute(string query)
+        private readonly SqlConnecter _sqlConn;
+
+            public SqlExecuteHelper(SqlConnecter sqlConn)
+        {
+            _sqlConn = sqlConn;
+        }
+        public string Execute(string query)
         {
             try
             {
-                var conn = SqlConnecter.SqlConn();
+                var conn = _sqlConn.SqlConn();
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

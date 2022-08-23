@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -8,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Helper
 {
-    internal class HttpAuthenticator
+    public class HttpAuthenticator
     {
-        public static async Task<string> Auth(string contentType,string token, string url, string body)
+        public static  async Task<string> Auth(string contentType,string token, string url, string body)
         {
             try
             {
@@ -24,9 +25,10 @@ namespace Eletricity.Helper
                 return resultContent;
             }
             catch (Exception ex)
-            {
+            { 
+                //_logger.LogInformation(ex.Message);
                 return null;
-                //log.LogInformation(ex.Message);
+               
             }
 
            

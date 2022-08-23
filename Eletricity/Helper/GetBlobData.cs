@@ -1,4 +1,7 @@
 ﻿using Azure.Storage.Blobs;
+using Eletricity.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,15 +13,26 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Helper
 {
-    internal class GetBlobData
+    public class GetBlobData
     {
+        private readonly BlobStorageSettings _BlobSettings;
+        private readonly ILogger<GetBlobData> _logger;
 
-        public static async Task<string> GetBlobFile(string name)
+
+
+        public GetBlobData(IOptions<BlobStorageSettings> blobSettings, ILogger<GetBlobData> logger)
+        {
+
+            _BlobSettings = blobSettings?.Value ?? throw new ArgumentNullException(nameof(blobSettings));
+            _logger = logger;
+        }
+
+        public  async Task<string> GetBlobFile(string name)
         {
             try
             {
 
-                var blobStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=saeletricity;AccountKey=xxxxxxxxxxxx;EndpointSuffix=core.windows.net";
+                var blobStorageConnectionString = $"DefaultEndpointsProtocol=https;AccountName={_BlobSettings.StorageName};;AccountKey={_BlobSettings.StorageKey};EndpointSuffix=core.windows.net";
                 var blobStorageContainerName = "eletricityfiles";
                 var container = new BlobContainerClient(blobStorageConnectionString, blobStorageContainerName);
                 BlobClient blob = container.GetBlobClient($"{name}.json");
@@ -33,7 +47,7 @@ namespace Eletricity.Helper
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
                 return string.Empty;
             }
 

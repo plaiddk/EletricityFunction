@@ -32,8 +32,9 @@ namespace Eletricity.Helper
                 }
                 catch (Exception ex)
                 {
+                    //_logger.LogInformation(ex.Message);
                     return null;
-                    //log.LogInformation(ex.Message);
+                    
                 }
             }
         }

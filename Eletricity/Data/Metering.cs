@@ -1,4 +1,5 @@
 ﻿using Eletricity.Helper;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,10 +12,25 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Data
 {
-    internal class Metering
+    public class Metering
     {
+        private readonly UploadBlob _uploadBlob;
+        private readonly GetBlobData _getBlob;
+        private readonly InsertData _insertData;
+        private readonly SqlConnecter _sqlConnecter;
+        private readonly ILogger<Metering> _logger;
 
-        public static async Task GetMetering(string body, string contentType, string token, string incrementalDate)
+
+        public Metering(UploadBlob uploadBlob, GetBlobData getBlob, InsertData insertData, SqlConnecter sqlConnecter, ILogger<Metering> logger)
+        {
+            _uploadBlob = uploadBlob;
+            _getBlob = getBlob;
+            _insertData = insertData;
+            _sqlConnecter = sqlConnecter;
+            _logger = logger;
+        }
+
+        public  async Task GetMetering(string body, string contentType, string token, string incrementalDate)
         {
             try
             {
@@ -23,6 +39,7 @@ namespace Eletricity.Data
                 string fromdate = incrementalDate; //DateTime.Now.AddDays(-730).ToString("yyyy-MM-dd");
                 string todate = null;
 
+                //CANNOT EXCEED 730 DAYS - 700 IS FINE FOR NOW
                 if (DateTime.Parse(incrementalDate).AddDays(700) > DateTime.Now)
                 {
                     todate = DateTime.Now.ToString("yyyy-MM-dd");
@@ -36,21 +53,21 @@ namespace Eletricity.Data
 
                 string resultData = await HttpAuthenticator.Auth(contentType, token, apiurl, body);
 
-                UploadBlob.UploadBlobFile("Metering", resultData);
+                _uploadBlob.UploadBlobFile("Metering", resultData);
             }
             catch (Exception ex)
             {
 
-               // log.LogInformation(ex.Message);
+               _logger.LogInformation(ex.Message);
             }
 
         }
 
-        public static async Task InsertMetering()
+        public  async Task InsertMetering()
         {
             try
             {
-                string jsonMetering = await GetBlobData.GetBlobFile("Metering");
+                string jsonMetering = await _getBlob.GetBlobFile("Metering");
                 var datasetMetering = ReadDataFromJsonHelper.ReadDataFromJson(jsonMetering);
 
                 if (datasetMetering.Tables.Count < 4)
@@ -59,18 +76,18 @@ namespace Eletricity.Data
                 }
                 else
                 {
-                    InsertData.InsertDataSQL(datasetMetering, "insertmetering");
+                    _insertData.InsertDataSQL(datasetMetering, "insertmetering");
                 }
             }
             catch (Exception ex)
             {
 
-                //log.LogInformation(ex.Message);
+                _logger.LogInformation(ex.Message);
             }
 
         }
 
-        public static string GetIncrementalDate()
+        public  string GetIncrementalDate()
 
         {
             try
@@ -79,7 +96,7 @@ namespace Eletricity.Data
                 string query = "Select max(DataEnd) as MaxDate from [dm].[HourDataHistory]";
                 string incrementalDate = null;
 
-                var conn = SqlConnecter.SqlConn();
+                var conn = _sqlConnecter.SqlConn();
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     conn.Open();
@@ -105,9 +122,10 @@ namespace Eletricity.Data
                 return incrementalDate;
             }
             catch (Exception ex)
-            {
+            { 
+                _logger.LogInformation(ex.Message);
                 return null;
-                // log.LogInformation(ex.Message);
+               
             }
 
            

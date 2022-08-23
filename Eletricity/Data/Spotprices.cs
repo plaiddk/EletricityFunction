@@ -1,4 +1,5 @@
 ﻿using Eletricity.Helper;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,9 +12,22 @@ using static Eletricity.Helper.RecordDataTableConvert;
 
 namespace Eletricity.Data
 {
-    internal class Spotprices
+    public class Spotprices
     {
-        public static void getSpotPrice(string date)
+        private readonly UploadBlob _uploadBlob;
+        private readonly SqlConnecter _sqlConn;      
+        private readonly SqlExecuteHelper _sqlHelper;
+        private readonly ILogger<Spotprices> _logger;
+
+        public Spotprices(UploadBlob uploadBlob, SqlConnecter sqlConn, SqlExecuteHelper sqlHelper, ILogger<Spotprices> logger)
+        {
+            _uploadBlob = uploadBlob;
+            _sqlConn = sqlConn;
+            _sqlHelper = sqlHelper;
+            _logger = logger;
+        }
+
+        public  void getSpotPrice(string date)
         {
             try
             {
@@ -27,7 +41,7 @@ namespace Eletricity.Data
                     {
                         string json = content.ReadAsStringAsync().Result;
 
-                        UploadBlob.UploadBlobFile("HourlySpotPrices", json);
+                        _uploadBlob.UploadBlobFile("HourlySpotPrices", json);
 
                         JObject tmp = JObject.Parse(json);
                         string jsonhourly = tmp["result"].ToString();
@@ -46,22 +60,23 @@ namespace Eletricity.Data
             catch (Exception ex)
             {
 
-                //log.LogInformation(ex.Message);
+               _logger.LogInformation(ex.Message);
             }
         }
 
-        public static string GetIncrementalDate()
+        public  string GetIncrementalDate()
 
         {
             try
             {
-                var delete = SqlExecuteHelper.Execute("delete from [dm].[SpotpricesHistory] where SpotPriceDKK is null");
+                //LOGIC WORKS FOR NOW - COME BACK LATER
+                var delete = _sqlHelper.Execute("delete from [dm].[SpotpricesHistory] where SpotPriceDKK is null");
 
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 string query = "Select max([HourUTC]) as MaxDate from [dm].[SpotpricesHistory] where SpotPriceDKK is not null";
                 string incrementalDate = null;
 
-                var conn = SqlConnecter.SqlConn();
+                var conn = _sqlConn.SqlConn();
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     conn.Open();
@@ -87,20 +102,21 @@ namespace Eletricity.Data
                 return incrementalDate;
             }
             catch (Exception ex)
-            {
+            { 
+                _logger.LogInformation(ex.Message);
                 return null;
-                //log.LogInformation(ex.Message);
+                
             }
 
            
 
         }
         
-        public static void InsertSpotPrice(DataTable dt)
+        public  void InsertSpotPrice(DataTable dt)
         {
             try
             {
-                var conn = SqlConnecter.SqlConn();
+                var conn = _sqlConn.SqlConn();
                 using (SqlBulkCopy bulk = new SqlBulkCopy(conn))
                 {
 
@@ -115,7 +131,7 @@ namespace Eletricity.Data
             catch (Exception ex)
             {
 
-                //log.LogInformation(ex.Message);
+                _logger.LogInformation(ex.Message);
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Eletricity.Configuration;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -7,13 +9,20 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Helper
 {
-    internal class SqlConnecter
+    public class SqlConnecter
     {
+        private readonly SQLSettings _connectionStrings;
 
-        public  static SqlConnection SqlConn()
+        public SqlConnecter(IOptions<SQLSettings> connectionStringSettings)
+        {
+
+            _connectionStrings = connectionStringSettings?.Value ?? throw new ArgumentNullException(nameof(connectionStringSettings));
+
+        }
+        public  SqlConnection SqlConn()
 
         { 
-           SqlConnection conn = new SqlConnection(@"Data Source=eletricity.database.windows.net;Initial Catalog=EletricityDB;User ID=sqladmin;Password=xxxxxxxx;Encrypt=True;TrustServerCertificate=False;Persist Security Info=False");
+           SqlConnection conn = new SqlConnection($@"Data Source={_connectionStrings.SQLServer};Initial Catalog={_connectionStrings.SQLDatabase};User ID={_connectionStrings.SQLUser};Password={_connectionStrings.SQLPassword};Encrypt=True;TrustServerCertificate=False;Persist Security Info=False");
             return conn;         
           
         }

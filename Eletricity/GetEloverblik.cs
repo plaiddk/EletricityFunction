@@ -12,20 +12,25 @@ using Microsoft.Extensions.Options;
 
 namespace Eletricity
 {
-    
+
     public class GetEloverblik
     {
 
-        private readonly ConnectionSettings _connectionSettings;
-        private static ELoverblikAccess _eloverblikAccess;
-  
+        private readonly ELOverblikSettings eLOverblikSettings;
+        private readonly ElOverblikToken _elOverblikToken;
+        private readonly Prices _prices;
+        private readonly Metering _metering;
+        private readonly Spotprices _spotPrices;
 
-        public GetEloverblik(IOptions<ConnectionSettings> connectionStrings, IOptions<ELoverblikAccess> eloverblikAccess)
+
+        public GetEloverblik(IOptions<ELOverblikSettings> eloverblikAccess, ElOverblikToken eloverblikToken, Prices prices, Metering metering, Spotprices spotPrices)
         {
-          
-            _connectionSettings = connectionStrings?.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
-            _eloverblikAccess = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
-         
+
+            eLOverblikSettings = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
+            _elOverblikToken = eloverblikToken;
+            _prices = prices;
+            _metering = metering;
+            _spotPrices = spotPrices;
         }
 
         [FunctionName("GetEloverblik")]
@@ -36,21 +41,17 @@ namespace Eletricity
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
-        public  async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 
 #endif
-        {            
-            var d = _eloverblikAccess.MeteringToken;
-            var s = _connectionSettings.SQLPassword;
-           
+        {
+
             try
             {
-                ///HER ER MIN FEJL : JEG GÆTTER PÅ NOGET MED ET INTERFACE SKAL LAVES?
-                ///DEN BROKKER SIG OVER STATIC KLASSER - MEN JEG FORSTÅR MIG IKKE HELT PÅ DEPENDENCY INJECTION JEG HAR LAVET ØVERST
-                ///VILLE TROR DEN SKULLE ARVE EN VOID FRA ET INTERFACE? ELLER MÅSKE DER ER EN SMARTERE MÅDE
+
                 //Get token access
-                string token = await ElOverblikToken.GetToken();  
+                string token = await _elOverblikToken.GetToken();
 
                 //general api settings
                 string body = @"{
@@ -60,13 +61,13 @@ namespace Eletricity
                                                          ]
                                             }
                              }";
-                body.Replace("X", _eloverblikAccess.MeteringKey);
+                body.Replace("X", eLOverblikSettings.MeteringKey);
                 string contentType = "application/json";
 
-              //  await Prices.GetPrices(body, contentType, token);
+                await _prices.GetPrices(body, contentType, token);
 
-                string incrementalDate = Metering.GetIncrementalDate();
-                //await Metering.GetMetering(body, contentType, token, incrementalDate);
+                string incrementalDate = _metering.GetIncrementalDate();
+                await _metering.GetMetering(body, contentType, token, incrementalDate);
             }
             catch (Exception ex)
             {
@@ -77,6 +78,11 @@ namespace Eletricity
             return new OkObjectResult("Done");
         }
 
+
+
+
+
+
         [FunctionName("DataToSQL")]
 
 #if RELEASE
@@ -85,15 +91,15 @@ namespace Eletricity
         public static async Task<IActionResult> RunSql(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
-        public static async Task<IActionResult> RunSql(
+        public async Task<IActionResult> RunSql(
           [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 
 #endif
         {
             try
             {
-                await Prices.InsertPrice();
-                await Metering.InsertMetering();
+                await _prices.InsertPrice();
+                await _metering.InsertMetering();
             }
             catch (Exception ex)
             {
@@ -114,15 +120,15 @@ namespace Eletricity
       public static Task<string> Spot(
           [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 #else
-        public static Task<string> Spot(
+        public Task<string> Spot(
           [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
 
 #endif
         {
             try
             {
-                var date = Spotprices.GetIncrementalDate();
-                Spotprices.getSpotPrice(date);
+                var date = _spotPrices.GetIncrementalDate();
+                _spotPrices.getSpotPrice(date);
             }
             catch (Exception ex)
             {
@@ -130,9 +136,9 @@ namespace Eletricity
                 log.LogInformation(ex.Message);
             }
 
-            return Task.FromResult("done"); 
+            return Task.FromResult("done");
         }
 
-       
+
     }
 }

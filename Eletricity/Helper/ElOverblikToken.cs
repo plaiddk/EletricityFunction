@@ -1,5 +1,6 @@
 ﻿using Eletricity.Configuration;
 using Eletricity.Helper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,15 +16,17 @@ namespace Eletricity
 
     public class ElOverblikToken
     {     
-        private readonly ELoverblikAccess _eloverblikAccess;     
+        private readonly ELOverblikSettings _eloverblikSettings;
+        private readonly ILogger<ElOverblikToken> _logger;
 
 
-        public  ElOverblikToken(IOptions<ConnectionSettings> connectionStrings, IOptions<ELoverblikAccess> eloverblikAccess)
+        public  ElOverblikToken(IOptions<ELOverblikSettings> eloverblikAccess, ILogger<ElOverblikToken> logger)
         {
-          
-            _eloverblikAccess = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
+
+            _eloverblikSettings = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
+            _logger = logger;
         }
-       
+
 
         public async Task<string>GetToken()
         {
@@ -32,7 +35,7 @@ namespace Eletricity
                 {
                     //Get Token            
                     string Token_url = "https://api.eloverblik.dk/CustomerApi/api/Token";
-                    string Refresh_token = _eloverblikAccess.MeteringToken;
+                    string Refresh_token = _eloverblikSettings.MeteringToken;
 
                     HttpClient client = new HttpClient();
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Refresh_token);
@@ -45,9 +48,10 @@ namespace Eletricity
                    return token;
                 }
                 catch (Exception ex)
-                {
-                    return null;
-                    //log.LogInformation(ex.Message);
+            { 
+                _logger.LogInformation(ex.Message);
+                return null;
+                    
                 }
 
 

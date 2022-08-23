@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,16 +9,26 @@ using System.Threading.Tasks;
 
 namespace Eletricity.Helper
 {
-    internal class InsertData
+    public class InsertData
+
     {
-        public static void InsertDataSQL(DataSet _dataset, string option)
+        private readonly SqlConnecter _sqlConn;
+        private readonly ILogger<InsertData> _logger;
+
+            public InsertData(SqlConnecter sqlConn, ILogger<InsertData> logger)
+        {
+            _sqlConn = sqlConn;
+            _logger = logger;
+        }
+        public  void InsertDataSQL(DataSet _dataset, string option)
         {
             try
             {
-                var conn = SqlConnecter.SqlConn();
+                var conn = _sqlConn.SqlConn();
                 using (SqlBulkCopy bulk = new SqlBulkCopy(conn))
                 {
-
+                    //Write new logic later on ---- This is not solid - EF?
+                    //WORKS FOR NOW
                     foreach (DataTable item in _dataset.Tables)
                     {
 
@@ -88,7 +99,7 @@ namespace Eletricity.Helper
             catch (Exception ex)
             {
 
-                //log.LogInformation(ex.Message);
+                _logger.LogError(ex.Message);
             }
 
 
