@@ -14,3 +14,21 @@ Jeg har valgt at gøre brug af:
 - Microsoft PowerBI
 
 Kontakt mig endelig på ten@energinet.dk for spørgsmål, ideer eller hvis der mangler noget:) 
+
+# LOCAL.SETTINGS.JSON
+Strukturen på local.settings.json og den struktur som bliver brugt i Azure Function er som ne
+
+ "SQLSettings": 
+ { "SQLUser":  "xxxxxxxxxxx",
+ "SQLPassword": "xxxxxxxxxxx",
+    "SQLServer": "xxxxxxxxxxx",
+    "SQLDatabase" : "xxxxxxxxxxx"
+  },
+  "BlobStorageSettings": {
+    "StorageKey": "xxxxxxxxxxx",
+    "StorageName": "xxxxxxxxxxx"
+  },
+  "ELOverblikSettings": {
+    "MeteringKey": "xxxxxxxxxxx",
+    "MeteringToken": "xxxxxxxxxxx"
+  }
