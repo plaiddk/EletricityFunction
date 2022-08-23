@@ -16,7 +16,10 @@ Jeg har valgt at gøre brug af:
 Kontakt mig endelig på ten@energinet.dk for spørgsmål, ideer eller hvis der mangler noget:) 
 
 # LOCAL.SETTINGS.JSON
-Strukturen på local.settings.json og den struktur som bliver brugt i Azure Function er som ne
+Strukturen på local.settings.json og den struktur som bliver brugt i Azure Function er som vist herunder:
+
+Azure function App Settings skrives således: SQLSettings:SQLUser osv..
+
 
  "SQLSettings": 
  { "SQLUser":  "xxxxxxxxxxx",
