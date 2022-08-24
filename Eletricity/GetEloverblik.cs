@@ -133,8 +133,8 @@ namespace Eletricity
         {
             try
             {
-               // var date = _spotPrices.GetIncrementalDate();
-               // _spotPrices.getSpotPrice(date);
+                var date = _spotPrices.GetIncrementalDate();
+                _spotPrices.getSpotPrice(date);
 
                 //Get tariffs
                 _tariff.getTariffs();

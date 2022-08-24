@@ -32,7 +32,7 @@ namespace Eletricity.Data
             try
             {
                 //Get hourly prices
-                string url = $"https://api.energidataservice.dk/dataset/DatahubPricelist?start=2022-01-01T00:00&end=2022-12-31T00:00";
+                string url = @"https://api.energidataservice.dk/dataset/DatahubPricelist?start=2018-01-01T00:00&filter={""GLN_Number"":""5790001100520""}";
                 HttpClient hourprice = new HttpClient();
                 using (HttpResponseMessage response = hourprice.GetAsync(url).Result)
                 using (HttpContent content = response.Content)
