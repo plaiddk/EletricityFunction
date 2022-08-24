@@ -1,1 +1,195 @@
-
+{
+    "name": "PL_LoadEloverblik",
+    "properties": {
+        "activities": [
+            {
+                "name": "Azure Function Get Json Data",
+                "type": "AzureFunctionActivity",
+                "dependsOn": [
+                    {
+                        "activity": "SP truncate all",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "functionName": "GetEloverblik",
+                    "method": "GET"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_FA_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Azure Function DataToSQL",
+                "type": "AzureFunctionActivity",
+                "dependsOn": [
+                    {
+                        "activity": "Azure Function Get Json Data",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "functionName": "DataToSQL",
+                    "method": "GET"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_FA_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SP truncate all",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_truncateall]"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_SQL_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Azure Function SpotPrices",
+                "type": "AzureFunctionActivity",
+                "dependsOn": [
+                    {
+                        "activity": "Azure Function DataToSQL",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "functionName": "GetSpotPrices",
+                    "method": "GET"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_FA_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SP PriceMerge",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "Azure Function SpotPrices",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_pricemerge]"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_SQL_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SP SpotPrice Merge",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "SP PriceMerge",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_Spotpricemerge]"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_SQL_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SP Hourdata Merge",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "SP SpotPrice Merge",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_HourDatamerge]"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_SQL_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2022-06-12T13:10:54Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
