@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Eletricity.Configuration;
 using Eletricity.Data;
@@ -21,9 +22,10 @@ namespace Eletricity
         private readonly Prices _prices;
         private readonly Metering _metering;
         private readonly Spotprices _spotPrices;
+        private readonly Tariff _tariff;
 
 
-        public GetEloverblik(IOptions<ELOverblikSettings> eloverblikAccess, ElOverblikToken eloverblikToken, Prices prices, Metering metering, Spotprices spotPrices)
+        public GetEloverblik(IOptions<ELOverblikSettings> eloverblikAccess, ElOverblikToken eloverblikToken, Prices prices, Metering metering, Spotprices spotPrices, Tariff tariff)
         {
 
             _eLOverblikSettings = eloverblikAccess?.Value ?? throw new ArgumentNullException(nameof(eloverblikAccess));
@@ -31,6 +33,7 @@ namespace Eletricity
             _prices = prices;
             _metering = metering;
             _spotPrices = spotPrices;
+            _tariff = tariff;
         }
 
         [FunctionName("GetEloverblik")]
@@ -54,16 +57,19 @@ namespace Eletricity
                 string token = await _elOverblikToken.GetToken();
 
                 //general api settings
-                string body = @"{
+                StringBuilder builder = new StringBuilder(@"{
                          ""meteringPoints"": {
                                      ""meteringPoint"": [
-                                               ""X""
+                                               ""xxxx""
                                                          ]
                                             }
-                             }";
-                body.Replace("X", _eLOverblikSettings.MeteringKey);
-                string contentType = "application/json";
+                             }");
+
+                string body =  builder.Replace("xxxx", _eLOverblikSettings.MeteringKey).ToString();
                
+             
+                string contentType = "application/json";
+                                              
                 await _prices.GetPrices(body, contentType, token);
 
                 string incrementalDate = _metering.GetIncrementalDate();
@@ -127,8 +133,11 @@ namespace Eletricity
         {
             try
             {
-                var date = _spotPrices.GetIncrementalDate();
-                _spotPrices.getSpotPrice(date);
+               // var date = _spotPrices.GetIncrementalDate();
+               // _spotPrices.getSpotPrice(date);
+
+                //Get tariffs
+                _tariff.getTariffs();
             }
             catch (Exception ex)
             {

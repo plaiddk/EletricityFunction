@@ -45,7 +45,8 @@ namespace Eletricity
 
             builder.Services.AddSingleton<Prices>();
             builder.Services.AddSingleton<Metering>();
-            builder.Services.AddSingleton<Spotprices>(); 
+            builder.Services.AddSingleton<Spotprices>();
+            builder.Services.AddSingleton<Tariff>();
 
             builder.Services.AddSingleton<UploadBlob>();
             builder.Services.AddSingleton<GetBlobData>();
