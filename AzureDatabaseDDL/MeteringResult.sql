@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[MeteringResult](
+	[result_Id] [int] NULL,
+	[success] [bit] NULL,
+	[errorCode] [nvarchar](100) NULL,
+	[errorCodeEnum] [nvarchar](100) NULL,
+	[errorText] [nvarchar](500) NULL,
+	[id] [nvarchar](50) NULL,
+	[stackTrace] [nvarchar](500) NULL
+) ON [PRIMARY]
