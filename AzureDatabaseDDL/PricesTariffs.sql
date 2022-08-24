@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[PricesTariffs](
+	[tariffid] [nvarchar](50) NULL,
+	[name] [nvarchar](250) NULL,
+	[description] [nvarchar](1000) NULL,
+	[owner] [nvarchar](50) NULL,
+	[periodType] [nvarchar](10) NULL,
+	[validFromDate] [nvarchar](50) NULL,
+	[validToDate] [nvarchar](50) NULL,
+	[tariffs_Id] [nvarchar](50) NULL,
+	[result_Id] [nvarchar](50) NULL
+) ON [PRIMARY]
