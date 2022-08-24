@@ -1,5 +1,8 @@
 # EletricityFunction
 
+----UPDATE----
+Har lige fundet ud af at jeg mangler et C i Eletricity :) - Fred være med det! 
+----END UPDATE----
 
 Tak fordi du har interesse i min ELOverbliks applikation. Denne version er udarbejdet over længere tid, og indeholder både ny og gammel kode.
 Azure Functionen er delt op i 3 elementer.
