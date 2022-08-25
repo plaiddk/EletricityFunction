@@ -159,7 +159,7 @@ namespace Eletricity
         {
             try
             {
-                //Get prognose
+                //Get prognose - 
                 _prognose.getPrognose();
             }
             catch (Exception ex)
