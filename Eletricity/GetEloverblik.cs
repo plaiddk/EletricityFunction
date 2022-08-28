@@ -129,10 +129,7 @@ namespace Eletricity
             try
             {
                  var date = _spotPrices.GetIncrementalDate();
-                 _spotPrices.getSpotPrice(date);
-
-                //Get tariffs
-                _tariff.getTariffs();
+                 _spotPrices.getSpotPrice(date);               
             
             }
             catch (Exception ex)
@@ -171,6 +168,33 @@ namespace Eletricity
             return Task.FromResult("done");
         }
 
+
+        [FunctionName("GetTariffs")]
+
+#if RELEASE
+               
+         //public  async Task RunAsync([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+      public  Task<string> GetTariffsData(
+          [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
+#else
+        public Task<string> GetTariffsData(
+         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
+
+#endif
+        {
+            try
+            {
+                //Get tariffs
+                _tariff.getTariffs();
+            }
+            catch (Exception ex)
+            {
+
+                log.LogError(ex.Message);
+            }
+
+            return Task.FromResult("done");
+        }
 
 
     }
