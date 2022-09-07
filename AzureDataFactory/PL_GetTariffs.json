@@ -1,0 +1,31 @@
+{
+    "name": "PL_GetTariffs",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetTariffs",
+                "type": "AzureFunctionActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "functionName": "GetTariffs",
+                    "method": "GET"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_FA_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2022-08-28T17:24:22Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
