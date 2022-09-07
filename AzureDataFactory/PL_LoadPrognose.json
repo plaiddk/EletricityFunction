@@ -1,0 +1,58 @@
+{
+    "name": "PL_LoadPrognose",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetPrognose",
+                "type": "AzureFunctionActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "functionName": "GetPrognoseData",
+                    "method": "GET"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_FA_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "SP PrognoseMerge",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "GetPrognose",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_PrognoseSpotpricemerge]"
+                },
+                "linkedServiceName": {
+                    "referenceName": "AZ_SQL_Eletricity",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2022-08-28T06:29:33Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
