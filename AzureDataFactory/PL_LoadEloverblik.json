@@ -79,39 +79,11 @@
                 }
             },
             {
-                "name": "Azure Function SpotPrices",
-                "type": "AzureFunctionActivity",
-                "dependsOn": [
-                    {
-                        "activity": "Azure Function DataToSQL",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "7.00:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "functionName": "GetSpotPrices",
-                    "method": "GET"
-                },
-                "linkedServiceName": {
-                    "referenceName": "AZ_FA_Eletricity",
-                    "type": "LinkedServiceReference"
-                }
-            },
-            {
                 "name": "SP PriceMerge",
                 "type": "SqlServerStoredProcedure",
                 "dependsOn": [
                     {
-                        "activity": "Azure Function SpotPrices",
+                        "activity": "Execute PL_GetTarffis",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -186,10 +158,50 @@
                     "referenceName": "AZ_SQL_Eletricity",
                     "type": "LinkedServiceReference"
                 }
+            },
+            {
+                "name": "Execute PL_GetTarffis",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Execute GetSpotPrices",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "PL_GetTariffs",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "Execute GetSpotPrices",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Azure Function DataToSQL",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "PL_GetSpotPrices",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
             }
         ],
         "annotations": [],
-        "lastPublishTime": "2022-06-12T13:10:54Z"
+        "lastPublishTime": "2022-08-28T17:33:57Z"
     },
     "type": "Microsoft.DataFactory/factories/pipelines"
 }
