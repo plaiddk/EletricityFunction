@@ -32,7 +32,8 @@ namespace Eletricity.Data
             try
             {
                 //Get hourly prices
-                string url = $"https://api.energidataservice.dk/datastore_search_sql?sql=SELECT * from \"elspotprices\" where \"PriceArea\"='DK1' and \"HourDK\">'{date}'";
+                //OLD API string url = $"https://api.energidataservice.dk/datastore_search_sql?sql=SELECT * from \"elspotprices\" where \"PriceArea\"='DK1' and \"HourDK\">'{date}'";
+                string url = $"https://api.energidataservice.dk/dataset/Elspotprices?start={date}&filter=%7B%22PriceArea%22:%22DK1%22%7D";
                 HttpClient hourprice = new HttpClient();
                 using (HttpResponseMessage response = hourprice.GetAsync(url).Result)
                 using (HttpContent content = response.Content)
@@ -44,7 +45,7 @@ namespace Eletricity.Data
                         _uploadBlob.UploadBlobFile("HourlySpotPrices", json);
 
                         JObject tmp = JObject.Parse(json);
-                        string jsonhourly = tmp["result"].ToString();
+                        string jsonhourly = tmp["records"].ToString();
 
                         var settings = new JsonSerializerSettings
                         {
