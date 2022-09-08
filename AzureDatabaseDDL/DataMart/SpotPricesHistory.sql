@@ -2,8 +2,6 @@ CREATE TABLE [dm].[SpotpricesHistory](
 	[SportPriceEur] [varchar](50) NULL,
 	[HourUTC] [datetime] NULL,
 	[HourDK] [datetime] NULL,
-	[_full_text] [nvarchar](max) NULL,
-	[_id] [varchar](50) NULL,
 	[PriceArea] [varchar](50) NULL,
 	[SpotPriceDKK] [varchar](50) NULL
 ) ON [PRIMARY] 
